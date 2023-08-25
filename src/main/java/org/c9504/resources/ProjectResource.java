@@ -1,15 +1,14 @@
-package org.negrdo.resources;
+package org.c9504.resources;
 
 import io.vertx.core.json.JsonObject;
-import org.negrdo.entities.Project;
-import org.negrdo.producers.ProjectProducer;
+import org.c9504.entities.Project;
+import org.c9504.producers.ProjectProducer;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Random;
-import java.util.UUID;
 
 @Path("projects")
 @Consumes(MediaType.APPLICATION_JSON)

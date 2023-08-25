@@ -1,4 +1,4 @@
-package org.negrdo.consumers;
+package org.c9504.consumers;
 
 import io.smallrye.reactive.messaging.kafka.Record;
 import org.eclipse.microprofile.reactive.messaging.Incoming;

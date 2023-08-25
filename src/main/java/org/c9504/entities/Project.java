@@ -1,6 +1,4 @@
-package org.negrdo.entities;
-
-import io.vertx.core.json.JsonObject;
+package org.c9504.entities;
 
 public class Project {
 

@@ -1,4 +1,4 @@
-package org.negrdo;
+package org.c9504;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

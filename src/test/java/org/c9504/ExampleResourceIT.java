@@ -1,4 +1,4 @@
-package org.negrdo;
+package org.c9504;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 

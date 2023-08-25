@@ -1,10 +1,9 @@
-package org.negrdo.producers;
+package org.c9504.producers;
 
 import io.smallrye.reactive.messaging.kafka.Record;
-import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.negrdo.entities.Project;
+import org.c9504.entities.Project;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
