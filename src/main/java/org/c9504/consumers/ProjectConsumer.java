@@ -13,6 +13,6 @@ public class ProjectConsumer {
 
     @Incoming("projects-in")
     public void receiveProject(Record<Integer, String> project) {
-        logger.infof("Got a project: %d - %s", project.key(), project.value());
+        logger.infof("Got Consumer project: %d - %s", project.key(), project.value());
     }
 }
