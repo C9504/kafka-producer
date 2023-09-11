@@ -46,7 +46,7 @@ public class ProjectResource {
             random = null;
             project = null;
             try {
-                Thread.sleep(1000L);
+                Thread.sleep(3000L);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

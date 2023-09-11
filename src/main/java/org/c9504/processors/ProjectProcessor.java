@@ -22,7 +22,7 @@ public class ProjectProcessor {
     public Project processProject(Record<Integer, String> project) {
         logger.infof("Got Process project: %d - %s", project.key(), project.value());
         JsonObject processor = new JsonObject(project.value().toString());
-        processor.put("some", 100000);
+        processor.put("some", 100000000);
         return new Project(project.key(), processor.toString());
     }
 
