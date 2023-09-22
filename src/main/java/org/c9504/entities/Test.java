@@ -1,13 +1,25 @@
 package org.c9504.entities;
 
-import java.time.Instant;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.UUID;
 
-public class Test {
+@Entity
+@Table(name = "events")
+public class Test extends PanacheEntityBase {
 
+    @Id
+    @Column(unique = true, nullable = false, columnDefinition = "UUID DEFAULT uuid_generate_v4()")
     private UUID id;
+    @Column(name = "state", nullable = false)
     private String state;
+    @Column(name = "message", nullable = false)
     private String message;
+    @Column(name = "created_at", nullable = false)
     private Long createdAt;
 
     public Test() {

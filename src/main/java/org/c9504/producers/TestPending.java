@@ -21,7 +21,6 @@ public class TestPending {
 
     public void sendTestPending(Test test) {
         logger.infof("Test pending with Id: %s, State:  %s", test.getId().toString(), test.getState());
-        test.setState("PENDING");
         emitter.send(Record.of(Math.abs(new Random().nextInt()), test));
     }
 
