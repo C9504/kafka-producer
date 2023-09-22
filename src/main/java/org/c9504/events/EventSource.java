@@ -4,6 +4,7 @@ import io.smallrye.mutiny.Multi;
 import org.c9504.entities.Project;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.RestStreamElementType;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -39,7 +40,8 @@ public class EventSource {
 
     @GET
     @Path("/projects/{id}")
-    @Produces(MediaType.SERVER_SENT_EVENTS)
+    //@Produces(MediaType.SERVER_SENT_EVENTS)
+    @RestStreamElementType(MediaType.APPLICATION_JSON)
     public Multi<Project> streamProjects(@PathParam("id") int id/*, @Context SseEventSink eventSink, @Context Sse sse*/) {
         return projects.filter(project -> project.getId().equals(id));
     }
