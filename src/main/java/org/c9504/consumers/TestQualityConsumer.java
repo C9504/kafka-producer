@@ -7,19 +7,22 @@ import org.c9504.producers.TestDeploying;
 import org.c9504.producers.TestQuality;
 import org.c9504.repositories.TestRepository;
 import org.c9504.services.TestService;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
 public class TestQualityConsumer {
 
     private final Logger logger = Logger.getLogger(TestQualityConsumer.class);
-    
+
     @Inject
     Vertx vertx;
 
@@ -34,24 +37,29 @@ public class TestQualityConsumer {
 
     @Incoming("test-quality-in")
     @Transactional
-    public void receiveTestDeploying(Record<Integer, Test> test) {
-        UUID id = test.value().getId();
+    @Retry(delay = 10, maxRetries = 5)
+    public CompletionStage<Void> receiveTestDeploying(Message<Test> test) {
+        UUID id = test.getPayload().getId();
         Test toDeploy = testRepository.findById(id);
-        toDeploy.setState("QUALITY");
-        try {
-            Thread.sleep(5000L);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        testService.saveTest(toDeploy);
-        vertx.executeBlocking(future -> {
-            testDeploying.sendTestDeploying(toDeploy);
-            logger.infof("Got Consumer Quality ID: %s, State: %s", toDeploy.getId().toString(), toDeploy.getState());
-            future.complete();
-        }, false, asyncResult -> {
-            if (asyncResult.succeeded()) {
-                System.out.println("COMMITED TO DEPLOY");
+        if (toDeploy != null) {
+            toDeploy.setState("QUALITY");
+            try {
+                Thread.sleep(3000L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        });
+            testService.saveTest(toDeploy);
+            vertx.executeBlocking(future -> {
+                testDeploying.sendTestDeploying(toDeploy);
+                future.complete();
+            }, false, asyncResult -> {
+                if (asyncResult.succeeded()) {
+                    logger.infof("Got Consumer Quality ID: %s, State: %s", toDeploy.getId().toString(), toDeploy.getState());
+                    System.out.println("COMMITED TO DEPLOY");
+                }
+            });
+            return test.ack();
+        }
+        return test.nack(new Throwable("NOT ACKED").getCause());
     }
 }

@@ -7,7 +7,9 @@ import org.c9504.producers.TestPending;
 import org.c9504.producers.TestQuality;
 import org.c9504.repositories.TestRepository;
 import org.c9504.services.TestService;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -16,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
 public class TestPendingConsumer {
@@ -36,25 +39,30 @@ public class TestPendingConsumer {
 
     @Incoming("test-pending-in")
     @Transactional
-    public void receiveTestPending(Record<Integer, Test> test) {
-        UUID id = test.value().getId();
+    @Retry(delay = 10, maxRetries = 5)
+    public CompletionStage<Void> receiveTestPending(Message<Test> test) {
+        UUID id = test.getPayload().getId();
         Test toQuality = testRepository.findById(id);
-        toQuality.setState("QUALITY");
-        try {
-            Thread.sleep(5000L);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        testService.saveTest(toQuality);
-        vertx.executeBlocking(future -> {
-            testQuality.sendTestQuality(toQuality);
-            logger.infof("Got Consumer Pending ID: %s, State: %s", toQuality.getId().toString(), toQuality.getState());
-            future.complete();
-        }, false, asyncResult -> {
-            if (asyncResult.succeeded()) {
-                System.out.println("COMMITED TO QUALITY");
+        if (toQuality != null) {
+            toQuality.setState("QUALITY");
+            try {
+                Thread.sleep(3000L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        });
+            testService.saveTest(toQuality);
+            vertx.executeBlocking(future -> {
+                testQuality.sendTestQuality(toQuality);
+                future.complete();
+            }, false, asyncResult -> {
+                if (asyncResult.succeeded()) {
+                    logger.infof("Got Consumer Pending ID: %s, State: %s", toQuality.getId().toString(), toQuality.getState());
+                    System.out.println("COMMITED TO QUALITY");
+                }
+            });
+            return test.ack();
+        }
+        return test.nack(new Throwable("NO ACKED").getCause());
     }
 
 }
