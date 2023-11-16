@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-microservice
+  namespace: testbed
+  labels:
+    k8s-app: kafka-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kafka-microservice
+  template:
+    metadata:
+      labels:
+        k8s-app: kafka-microservice
+    spec:
+      containers:
+        - name: kafka-microservice
+          image: cesar9504/kafka-microservice:v0.0.0
+          env:
+            - name: DATABASE_HOSTNAME_PSQL
+              value: "localhost:5432/event_driven"
+            - name: DATABASE_USERNAME
+              value: "negrdo"
+            - name: DATABASE_PASSWORD
+              value: "admin9504**"
+            - name: DATABASE_GENERATION
+              value: create
+            - name: KAFKA_BROKERS
+              value: "idtolu-kafka-0.idtolu-kafka.testbed.svc.cluster.local:9092,idtolu-kafka-1.idtolu-kafka.testbed.svc.cluster.local:9092"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: false
+      restartPolicy: Always

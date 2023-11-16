@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kafka-microservice
+  namespace: testbed
+  labels:
+    k8s-app: kafka-microservice
+spec:
+  ports:
+    - name: kafka-microservice-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8084
+      nodePort: 30084
+  selector:
+    k8s-app: kafka-microservice
+  type: NodePort
